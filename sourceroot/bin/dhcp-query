@@ -6,8 +6,24 @@
 exec > /dhcp-query-result
 
 case "$1" in
-    'renew'|'bound')
-        printf 'binit_net_addr=%s\n' "${ip}/${mask}"
-        printf 'binit_net_gw=%s\n' "${router}"
+	'renew'|'bound')
+		set +f
+		printf 'binit_net_addr=%s\n' "${ip}/${mask}"
+		printf 'binit_net_gw=%s\n' "${router}"
+
+		# Only set from dhcp if not already set.
+		# May do this for binit_net_addr binit_net_gw as well.
+		if [ -n "${domain}" ]; then
+			if [ -z "${binit_net_domain}" ]; then
+				printf 'binit_net_domain=%s\n' "${domain}"
+			fi
+		fi
+
+		if [ -n "${dns}" ]; then
+			if [ -z "${binit_net_nss}" ]; then
+				printf 'binit_net_nss=%s\n' "${dns}"
+			fi
+		fi
+		set +f
     ;;  
 esac
